@@ -51,17 +51,25 @@ public class Scheduler_java {
         Clinics.get("PHC").stats();
         Clinics.get("MTZ").stats();
         
+        //TODO:
+        //Loop thru clinics
+        Clinic curr_clinic = Clinics.get("WCHC");
         //generate perms for wchc
         HashSet<String []> R1_perm = 
-        generatePermutations(Clinics.get("WCHC").R1set.length, R1_list, "R1");  //send cap of R1, entire R1 set
+        generatePermutations(curr_clinic.R1set.length, R1_list, "R1");  //send cap of R1, entire R1 set
         
         HashSet<String []> R2_perm = 
-        generatePermutations(Clinics.get("WCHC").R2set.length, R2_list, "R2");  //send cap of R2, entire R2 set
+        generatePermutations(curr_clinic.R2set.length, R2_list, "R2");  //send cap of R2, entire R2 set
         
         HashSet<String []> R3_perm = 
-        generatePermutations(Clinics.get("WCHC").R3set.length, R3_list, "R3");  //send cap of R3, entire R3 set
+        generatePermutations(curr_clinic.R3set.length, R3_list, "R3");  //send cap of R3, entire R3 set
         
+        ArrayList<int []> block_clinic_heuristic = generateHeuristic(R1_list, R1_perm); //arraylist of resident assignments for blocks in the entire year
+               
         
+                //TODO: Clean up
+                //alterWorkingSets()
+                
         
         
         
@@ -281,4 +289,28 @@ public class Scheduler_java {
     return result;
 }
     
+    public static ArrayList<int []> generateHeuristic(HashMap<String, Resident> resident_list, HashSet<String []> perm_list){
+        ArrayList<int []> heuristic_list = new ArrayList<int []>();
+        
+        for(String [] perm : perm_list){
+           for(int x = 0; x < 26; x++){ //for 26 blocks, assign days
+            int [] sample = new int [] {0,0,0,0,0,0,0,0,0,0};
+            for(int y = 0;y < perm.length; y++){  //each resident in the combo, ex: [R1-B, R1-E, R1-F, R1-M]
+                Resident r = resident_list.get(perm[y]); //get by label
+                 int [] totDays = r.Blocks.get(x).totDays;
+                    for(int z = 0; z < totDays.length; z++){
+                      sample[z] += totDays[z];    
+                        }
+                    }
+                heuristic_list.add(sample);
+                }
+            }
+        
+        System.out.println("heuristics for permutations: ");
+        for(int [] item : heuristic_list){
+            System.out.println(java.util.Arrays.toString(item));
+        }
+        
+        return heuristic_list;
+    }
 }
