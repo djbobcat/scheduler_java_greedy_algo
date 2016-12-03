@@ -64,7 +64,7 @@ public class Scheduler_java {
         HashSet<String []> R3_perm = 
         generatePermutations(curr_clinic.R3set.length, R3_list, "R3");  //send cap of R3, entire R3 set
         
-        ArrayList<int []> block_clinic_heuristic = generateHeuristic(R1_list, R1_perm); //arraylist of resident assignments for blocks in the entire year
+        ArrayList<ArrayList<int []>> block_clinic_heuristic = generateHeuristic(R1_list, R1_perm); //arraylist of resident assignments for blocks in the entire year
                
         
                 //TODO: Clean up
@@ -289,11 +289,12 @@ public class Scheduler_java {
     return result;
 }
     
-    public static ArrayList<int []> generateHeuristic(HashMap<String, Resident> resident_list, HashSet<String []> perm_list){
-        ArrayList<int []> heuristic_list = new ArrayList<int []>();
+    public static ArrayList<ArrayList<int[]>> generateHeuristic(HashMap<String, Resident> resident_list, HashSet<String []> perm_list){
+        ArrayList<ArrayList<int []>> heuristic_list = new ArrayList<ArrayList<int []>>();
         
         for(String [] perm : perm_list){
-           for(int x = 0; x < 26; x++){ //for 26 blocks, assign days
+            ArrayList<int []> rotation = new ArrayList<int []>();
+          for(int x = 0; x < 26; x++){ //for 26 blocks, assign days
             int [] sample = new int [] {0,0,0,0,0,0,0,0,0,0};
             for(int y = 0;y < perm.length; y++){  //each resident in the combo, ex: [R1-B, R1-E, R1-F, R1-M]
                 Resident r = resident_list.get(perm[y]); //get by label
@@ -302,15 +303,19 @@ public class Scheduler_java {
                       sample[z] += totDays[z];    
                         }
                     }
-                heuristic_list.add(sample);
+                rotation.add(sample);
                 }
+          heuristic_list.add(rotation);
             }
         
         System.out.println("heuristics for permutations: ");
-        for(int [] item : heuristic_list){
-            System.out.println(java.util.Arrays.toString(item));
+        for(ArrayList<int []> item_list : heuristic_list){
+            System.out.println("list size: " + item_list.size());
+//            for(int [] sample : item_list){
+//            System.out.println(java.util.Arrays.toString(sample));
+//            }
         }
-        
+        System.out.println("count: " + heuristic_list.size());
         return heuristic_list;
     }
 }
